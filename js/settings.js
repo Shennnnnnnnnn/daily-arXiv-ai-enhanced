@@ -1,15 +1,52 @@
-document.addEventListener('DOMContentLoaded', () => {
-  initSettings();
+document.addEventListener('DOMContentLoaded', async () => {
+  await initSettings();
   initEventListeners();
-  fetchGitHubStats();
+  loadJobStatus();
 });
 
 // 初始化设置，从localStorage加载已保存的设置
-function initSettings() {
-  // 关键词偏好设置
-  loadKeywordPreferences();
-  // 作者偏好设置
-  loadAuthorPreferences();
+async function initSettings() {
+  try {
+    const settings = await Api.request('/api/settings');
+    localStorage.setItem('preferredKeywords', JSON.stringify(settings.keywords || []));
+    localStorage.setItem('preferredAuthors', JSON.stringify(settings.authors || []));
+    loadKeywordPreferences();
+    loadAuthorPreferences();
+    setValue('aiApiBase', settings.base_url);
+    setValue('aiModel', settings.model);
+    setValue('paperAiAssistant', settings.paper_ai_assistant || 'kimi');
+    setValue('paperAiCustomUrl', settings.paper_ai_custom_url || '');
+    setValue('schedule', settings.schedule);
+    setValue('categories', (settings.categories || []).join(', '));
+    setValue('zoteroId', settings.zotero_id);
+    setValue('zoteroTargetCollection', settings.zotero_target_collection || '我的文库/arxiv');
+    setValue('zoteroEmbeddingModel', settings.zotero_embedding_model || 'text-embedding-3-small');
+    setValue('zoteroIncludePaths', (settings.zotero_include_paths || []).join(', '));
+    setValue('zoteroIgnorePaths', (settings.zotero_ignore_paths || []).join(', '));
+    setValue('zoteroMaxPapers', settings.zotero_max_papers || 20);
+    setValue('smtpHost', settings.smtp_host);
+    setValue('smtpPort', settings.smtp_port || 587);
+    setValue('smtpUser', settings.smtp_user);
+    setValue('emailFrom', settings.email_from);
+    setValue('emailTo', settings.email_to);
+    document.getElementById('emailEnabled').checked = settings.email_enabled === true;
+    document.getElementById('zoteroRecommendationEnabled').checked = settings.zotero_recommendation_enabled === true;
+    applySecretState('aiApiKey', settings.ai_api_key_configured);
+    applySecretState('zoteroKey', settings.zotero_key_configured);
+    applySecretState('smtpPassword', settings.smtp_password_configured);
+  } catch (error) {
+    showNotification(`加载设置失败：${error.message}`, 'info');
+  }
+}
+
+function setValue(id, value) {
+  const element = document.getElementById(id);
+  if (element && value !== undefined && value !== null) element.value = value;
+}
+
+function applySecretState(id, configured) {
+  const element = document.getElementById(id);
+  if (element && configured) element.placeholder = '已配置，留空则保持不变';
 }
 
 // 从localStorage加载关键词偏好
@@ -74,7 +111,7 @@ function showEmptyTagMessage() {
   const emptyMessage = document.createElement('div');
   emptyMessage.id = 'emptyTagMessage';
   emptyMessage.className = 'empty-tag-message';
-  emptyMessage.textContent = 'No keywords added yet. Add some keywords below.';
+  emptyMessage.textContent = '尚未添加关键词';
   selectedKeywordsContainer.appendChild(emptyMessage);
 }
 
@@ -84,7 +121,7 @@ function showEmptyAuthorMessage() {
   const emptyMessage = document.createElement('div');
   emptyMessage.id = 'emptyAuthorMessage';
   emptyMessage.className = 'empty-tag-message';
-  emptyMessage.textContent = 'No authors added yet. Add some authors below.';
+  emptyMessage.textContent = '尚未添加作者';
   selectedAuthorsContainer.appendChild(emptyMessage);
 }
 
@@ -300,6 +337,12 @@ function initEventListeners() {
   const saveSettingsButton = document.getElementById('saveSettings');
   saveSettingsButton.addEventListener('click', saveSettings);
 
+  document.getElementById('testEmail').addEventListener('click', testEmail);
+  document.getElementById('testAi').addEventListener('click', testAi);
+  document.getElementById('testZotero').addEventListener('click', testZotero);
+  document.getElementById('runJob').addEventListener('click', runJob);
+  document.getElementById('changePassword').addEventListener('click', changePassword);
+
   // 重置设置按钮
   const resetSettingsButton = document.getElementById('resetSettings');
   resetSettingsButton.addEventListener('click', resetSettings);
@@ -315,7 +358,7 @@ function copyKeywords() {
   });
 
   if (keywords.length === 0) {
-    showNotification('No keywords to copy!', 'info');
+    showNotification('暂无可复制的关键词', 'info');
     return;
   }
 
@@ -333,7 +376,7 @@ function copyAuthors() {
   });
 
   if (authors.length === 0) {
-    showNotification('No authors to copy!', 'info');
+    showNotification('暂无可复制的作者', 'info');
     return;
   }
 
@@ -369,14 +412,14 @@ function fallbackCopyText(text, successMessage) {
     showNotification(successMessage, 'success');
   } catch (err) {
     console.error('复制失败:', err);
-    showNotification('Failed to copy to clipboard', 'info');
+    showNotification('复制失败，请手动复制', 'info');
   }
 
   document.body.removeChild(textArea);
 }
 
 // 保存设置
-function saveSettings() {
+async function saveSettings() {
   // 获取所有选中的关键词
   const keywordTags = document.getElementById('selectedKeywords').querySelectorAll('.category-button');
   const keywords = [];
@@ -393,12 +436,140 @@ function saveSettings() {
     authors.push(authorName);
   });
   
-  // 保存设置到localStorage
-  localStorage.setItem('preferredKeywords', JSON.stringify(keywords));
-  localStorage.setItem('preferredAuthors', JSON.stringify(authors));
-  
-  // 显示保存成功提示，添加成功图标
-  showNotification('Settings saved successfully!', 'success');
+  const payload = {
+    keywords,
+    authors,
+    ai_api_key: document.getElementById('aiApiKey').value,
+    base_url: document.getElementById('aiApiBase').value.trim(),
+    model: document.getElementById('aiModel').value.trim(),
+    paper_ai_assistant: document.getElementById('paperAiAssistant').value,
+    paper_ai_custom_url: document.getElementById('paperAiCustomUrl').value.trim(),
+    schedule: document.getElementById('schedule').value,
+    categories: document.getElementById('categories').value.split(',').map(item => item.trim()).filter(Boolean),
+    zotero_id: document.getElementById('zoteroId').value.trim(),
+    zotero_key: document.getElementById('zoteroKey').value,
+    zotero_target_collection: document.getElementById('zoteroTargetCollection').value.trim(),
+    zotero_recommendation_enabled: document.getElementById('zoteroRecommendationEnabled').checked,
+    zotero_embedding_model: document.getElementById('zoteroEmbeddingModel').value.trim(),
+    zotero_include_paths: splitList('zoteroIncludePaths'),
+    zotero_ignore_paths: splitList('zoteroIgnorePaths'),
+    zotero_max_papers: Number(document.getElementById('zoteroMaxPapers').value || 20),
+    email_enabled: document.getElementById('emailEnabled').checked,
+    smtp_host: document.getElementById('smtpHost').value.trim(),
+    smtp_port: Number(document.getElementById('smtpPort').value || 587),
+    smtp_user: document.getElementById('smtpUser').value.trim(),
+    smtp_password: document.getElementById('smtpPassword').value,
+    email_from: document.getElementById('emailFrom').value.trim(),
+    email_to: document.getElementById('emailTo').value.trim()
+  };
+  try {
+    await Api.request('/api/settings', { method: 'PUT', body: JSON.stringify(payload) });
+    localStorage.setItem('preferredKeywords', JSON.stringify(keywords));
+    localStorage.setItem('preferredAuthors', JSON.stringify(authors));
+    ['aiApiKey', 'zoteroKey', 'smtpPassword'].forEach(id => { document.getElementById(id).value = ''; });
+    showNotification('设置已保存', 'success');
+  } catch (error) {
+    showNotification(`保存失败：${error.message}`, 'info');
+  }
+}
+
+function splitList(id) {
+  return document.getElementById(id).value
+    .split(',')
+    .map(item => item.trim())
+    .filter(Boolean);
+}
+
+async function runConfigTest(buttonId, statusId, path, payload, successMessage) {
+  const button = document.getElementById(buttonId);
+  const status = document.getElementById(statusId);
+  button.disabled = true;
+  status.textContent = '测试中...';
+  status.className = 'test-status pending';
+  try {
+    const result = await Api.request(path, { method: 'POST', body: JSON.stringify(payload) });
+    const detail = result.model || result.library_name || result.item_count;
+    status.textContent = detail ? `${successMessage}：${detail}` : successMessage;
+    status.className = 'test-status success';
+    showNotification(successMessage, 'success');
+  } catch (error) {
+    status.textContent = error.message;
+    status.className = 'test-status error';
+    showNotification(`测试失败：${error.message}`, 'info');
+  } finally {
+    button.disabled = false;
+  }
+}
+
+function testAi() {
+  return runConfigTest('testAi', 'aiTestStatus', '/api/ai/test', {
+    ai_api_key: document.getElementById('aiApiKey').value,
+    base_url: document.getElementById('aiApiBase').value.trim(),
+    model: document.getElementById('aiModel').value.trim()
+  }, 'AI 配置正常');
+}
+
+function testZotero() {
+  return runConfigTest('testZotero', 'zoteroTestStatus', '/api/zotero/test', {
+    zotero_id: document.getElementById('zoteroId').value.trim(),
+    zotero_key: document.getElementById('zoteroKey').value
+  }, 'Zotero 配置正常');
+}
+
+async function testEmail() {
+  try {
+    await saveSettings();
+    await Api.request('/api/email/test', { method: 'POST', body: '{}' });
+    showNotification('测试邮件已发送', 'success');
+  } catch (error) {
+    showNotification(`邮件发送失败：${error.message}`, 'info');
+  }
+}
+
+async function loadJobStatus() {
+  try {
+    const status = await Api.request('/api/jobs/status');
+    const lastResult = status.last_exit_code === null || status.last_exit_code === undefined
+      ? '尚未运行'
+      : (status.last_exit_code === 0 ? '最近运行成功' : `最近运行失败（${status.last_exit_code}）`);
+    document.getElementById('jobStatus').textContent = status.running ? '正在运行' : lastResult;
+  } catch (error) {
+    document.getElementById('jobStatus').textContent = error.message;
+  }
+}
+
+async function runJob() {
+  const button = document.getElementById('runJob');
+  button.disabled = true;
+  try {
+    await Api.request('/api/jobs/run', { method: 'POST', body: '{}' });
+    showNotification('任务已启动', 'success');
+    setTimeout(loadJobStatus, 1200);
+  } catch (error) {
+    showNotification(`启动失败：${error.message}`, 'info');
+  } finally {
+    button.disabled = false;
+  }
+}
+
+async function changePassword() {
+  const currentPassword = document.getElementById('currentPassword');
+  const newPassword = document.getElementById('newPassword');
+  if (newPassword.value.length < 12) {
+    showNotification('新密码至少需要 12 个字符', 'info');
+    return;
+  }
+  try {
+    await Api.request('/api/password', {
+      method: 'POST',
+      body: JSON.stringify({ current_password: currentPassword.value, new_password: newPassword.value })
+    });
+    currentPassword.value = '';
+    newPassword.value = '';
+    showNotification('管理员密码已更新', 'success');
+  } catch (error) {
+    showNotification(`密码更新失败：${error.message}`, 'info');
+  }
 }
 
 // 重置设置
@@ -479,20 +650,3 @@ function showNotification(message, type = 'success') {
     }, 300);
   }, 3000);
 }
-
-// 获取GitHub统计数据
-async function fetchGitHubStats() {
-  try {
-    const response = await fetch('https://api.github.com/repos/dw-dengwei/daily-arXiv-ai-enhanced');
-    const data = await response.json();
-    const starCount = data.stargazers_count;
-    const forkCount = data.forks_count;
-    
-    document.getElementById('starCount').textContent = starCount;
-    document.getElementById('forkCount').textContent = forkCount;
-  } catch (error) {
-    console.error('获取GitHub统计数据失败:', error);
-    document.getElementById('starCount').textContent = '?';
-    document.getElementById('forkCount').textContent = '?';
-  }
-} 

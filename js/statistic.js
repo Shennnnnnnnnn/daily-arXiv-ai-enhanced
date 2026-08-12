@@ -5,6 +5,26 @@ let flatpickrInstance = null;
 let isRangeMode = false;
 let allPapersData = [];
 
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
+function safeArxivUrl(value) {
+  try {
+    const url = new URL(String(value || ''), 'https://arxiv.org');
+    return url.protocol === 'https:' && ['arxiv.org', 'www.arxiv.org'].includes(url.hostname)
+      ? url.href
+      : 'https://arxiv.org';
+  } catch (_error) {
+    return 'https://arxiv.org';
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   // Check screen size
   const checkScreenSize = () => {
@@ -13,9 +33,9 @@ document.addEventListener('DOMContentLoaded', () => {
       warningModal.className = 'screen-size-warning';
       warningModal.innerHTML = `
         <div class="warning-content">
-          <h3>⚠️ Screen Size Notice</h3>
-          <p>We've detected that you're using a device with a small screen. For the best data visualization experience, we recommend viewing this statistics page on a larger screen device (such as a tablet or computer).</p>
-          <button onclick="this.parentElement.parentElement.remove()">Got it</button>
+          <h3>屏幕尺寸提示</h3>
+          <p>当前屏幕较小，建议使用平板或电脑查看统计图表，以获得更好的阅读体验。</p>
+          <button onclick="this.parentElement.parentElement.remove()">知道了</button>
         </div>
       `;
       document.body.appendChild(warningModal);
@@ -27,8 +47,6 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('resize', checkScreenSize);
 
   initEventListeners();
-  fetchGitHubStats();
-  
   fetchAvailableDates().then(() => {
     if (availableDates.length > 0) {
       loadPapersByDateRange(availableDates[0], availableDates[0]);
@@ -36,22 +54,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-
-async function fetchGitHubStats() {
-  try {
-    const response = await fetch('https://api.github.com/repos/dw-dengwei/daily-arXiv-ai-enhanced');
-    const data = await response.json();
-    const starCount = data.stargazers_count;
-    const forkCount = data.forks_count;
-    
-    document.getElementById('starCount').textContent = starCount;
-    document.getElementById('forkCount').textContent = forkCount;
-  } catch (error) {
-    console.error('获取GitHub统计数据失败:', error);
-    document.getElementById('starCount').textContent = '?';
-    document.getElementById('forkCount').textContent = '?';
-  }
-}
 
 function toggleDatePicker() {
   const datePicker = document.getElementById('datePickerModal');
@@ -259,7 +261,7 @@ async function loadPapersByDateRange(startDate, endDate) {
   });
   
   if (validDatesInRange.length === 0) {
-    alert('No available papers in the selected date range.');
+    alert('所选日期范围内暂无论文。');
     return;
   }
   
@@ -275,7 +277,7 @@ async function loadPapersByDateRange(startDate, endDate) {
   container.innerHTML = `
     <div class="loading-container">
       <div class="loading-spinner"></div>
-      <p>Loading papers from ${formatDate(startDate)} to ${formatDate(endDate)}...</p>
+      <p>正在加载 ${formatDate(startDate)} 至 ${formatDate(endDate)} 的论文...</p>
     </div>
   `;
   
@@ -437,7 +439,7 @@ async function loadPapersByDateRange(startDate, endDate) {
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M21.41 11.58L12.41 2.58C12.05 2.22 11.55 2 11 2H4C2.9 2 2 2.9 2 4V11C2 11.55 2.22 12.05 2.59 12.42L11.59 21.42C11.95 21.78 12.45 22 13 22C13.55 22 14.05 21.78 14.41 21.41L21.41 14.41C21.78 14.05 22 13.55 22 13C22 12.45 21.77 11.94 21.41 11.58ZM5.5 7C4.67 7 4 6.33 4 5.5C4 4.67 4.67 4 5.5 4C6.33 4 7 4.67 7 5.5C7 6.33 6.33 7 5.5 7Z" fill="currentColor"/>
           </svg>
-          Popular Keywords
+          热门关键词
         </h2>
         <div class="statistics-card">
           <div class="keyword-list">
@@ -456,7 +458,7 @@ async function loadPapersByDateRange(startDate, endDate) {
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M3.5 18.5L9.5 12.5L13.5 16.5L22 6.92L20.59 5.5L13.5 13.5L9.5 9.5L2 17L3.5 18.5Z" fill="currentColor"/>
           </svg>
-          Keywords Trend
+          关键词趋势
         </h2>
         <div class="statistics-card">
           <div id="trendChart" style="width: 100%; height: 400px;"></div>
@@ -707,8 +709,8 @@ async function loadPapersByDateRange(startDate, endDate) {
     console.error('加载论文数据失败:', error);
     container.innerHTML = `
       <div class="loading-container">
-        <p>Loading data fails. Please retry.</p>
-        <p>Error messages: ${error.message}</p>
+        <p>数据加载失败，请重试。</p>
+        <p>错误信息：${escapeHtml(error.message)}</p>
       </div>
     `;
   }
@@ -761,7 +763,7 @@ function parseJsonlData(jsonlText, date) {
 
 function formatDate(dateString) {
   const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', {
+  return date.toLocaleDateString('zh-CN', {
     year: 'numeric',
     month: 'numeric',
     day: 'numeric'
@@ -775,7 +777,7 @@ function showRelatedPapers(keyword) {
     const relatedPapersContainer = document.getElementById('relatedPapers');
     
     // 更新关键词显示
-    selectedKeywordElement.textContent = 'Keyword: ' + keyword;
+    selectedKeywordElement.textContent = '关键词：' + keyword;
     
     // 查找包含关键词的论文
     const relatedPapers = allPapersData.filter(paper => {
@@ -787,19 +789,19 @@ function showRelatedPapers(keyword) {
     const papersHTML = relatedPapers.map((paper, index) => `
         <div class="paper-card">
             <div class="paper-number">${index + 1}</div>
-            <a href="${paper.url}" target="_blank" class="paper-title">${paper.title}</a>
-            <div class="paper-authors">${paper.authors}</div>
+            <a href="${escapeHtml(safeArxivUrl(paper.url))}" target="_blank" rel="noopener noreferrer" class="paper-title">${escapeHtml(paper.title)}</a>
+            <div class="paper-authors">${escapeHtml(paper.authors)}</div>
             <div class="paper-categories">
-                ${paper.category.map(cat => `<span class="category-tag">${cat}</span>`).join('')}
+                ${(Array.isArray(paper.category) ? paper.category : [paper.category]).map(cat => `<span class="category-tag">${escapeHtml(cat)}</span>`).join('')}
             </div>
-            <div class="paper-summary">${paper.summary}</div>
+            <div class="paper-summary">${escapeHtml(paper.summary)}</div>
         </div>
     `).join('');
     
     // 更新侧边栏内容
     relatedPapersContainer.innerHTML = relatedPapers.length > 0 
         ? papersHTML 
-        : '<p>No related papers found.</p>';
+        : '<p>没有找到相关论文。</p>';
     
     // 显示侧边栏
     sidebar.classList.add('active');

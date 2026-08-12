@@ -1,0 +1,17 @@
+services:
+  web:
+    build:
+      context: .
+    ports:
+      - "127.0.0.1:${HOST_PORT:-8765}:8000"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      COOKIE_SECURE: "${COOKIE_SECURE:-false}"
+    volumes:
+      - arxiv-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  arxiv-data:

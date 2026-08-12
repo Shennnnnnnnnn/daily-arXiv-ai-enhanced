@@ -1,0 +1,6 @@
+.git
+__pycache__
+*.pyc
+.venv
+node_modules
+data/server.sqlite3

@@ -1,4 +1,4 @@
-Please analyze the following abstract of papers. 
+Please translate the title and analyze the following paper. Keep title_zh and summary_zh in Chinese when the requested language is Chinese.
 
 Content:
 {content}

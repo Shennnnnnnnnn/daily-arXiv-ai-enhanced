@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Access Verification - daily-arXiv-ai-enhanced</title>
+    <title>访问验证 - Daily arXiv AI Enhanced</title>
     <style>
         /* Clean login page styling */
         body {
@@ -146,16 +146,16 @@
             <img src="assets/logo2-removebg-preview.png" alt="Daily arXiv AI Enhanced Logo" class="logo-image">
             <span class="site-title">Daily arXiv AI Enhanced</span>
         </a>
-        <h1>Access Verification</h1>
-        <div class="subtitle">Please enter password to continue</div>
+        <h1>访问验证</h1>
+        <div class="subtitle">请输入管理密码后继续</div>
         <form id="loginForm">
             <div class="input-group">
-                <label for="password">Password</label>
+                <label for="password">管理密码</label>
                 <input
                     type="password"
                     id="password"
                     name="password"
-                    placeholder="Enter your password"
+                    placeholder="请输入密码"
                     required
                     autofocus
                     autocomplete="current-password"
@@ -163,19 +163,19 @@
             </div>
             <div class="remember-me">
                 <input type="checkbox" id="rememberMe" checked>
-                <label for="rememberMe">Remember me for 7 days</label>
+                <label for="rememberMe">保持登录 7 天</label>
             </div>
-            <button type="submit">Verify Access</button>
+            <button type="submit">登录</button>
             <div class="error-message" id="errorMessage">
-                ❌ Invalid password. Please try again.
+                密码错误，请重试。
             </div>
         </form>
         <div class="footer">
-            Powered by daily-arXiv-ai-enhanced
+            Daily arXiv AI Enhanced
         </div>
     </div>
 
-    <script src="js/auth-config.js"></script>
+    <script src="js/api.js"></script>
     <script src="js/auth.js"></script>
     <script>
         const form = document.getElementById('loginForm');
@@ -183,11 +183,26 @@
         const rememberMe = document.getElementById('rememberMe');
         const errorMessage = document.getElementById('errorMessage');
 
-        // If already authenticated, redirect to target page
-        if (Auth.isAuthenticated()) {
-            const redirect = new URLSearchParams(window.location.search).get('redirect') || 'index.html';
-            window.location.href = redirect;
+        function getSafeRedirect() {
+            const requested = new URLSearchParams(window.location.search).get('redirect') || 'index.html';
+            try {
+                const target = new URL(requested, window.location.origin);
+                if (target.origin !== window.location.origin) return 'index.html';
+                const path = target.pathname.replace(/^\//, '');
+                return ['index.html', 'settings.html', 'statistic.html'].includes(path)
+                    ? `${path}${target.search}${target.hash}`
+                    : 'index.html';
+            } catch (_error) {
+                return 'index.html';
+            }
         }
+
+        // If already authenticated, redirect to target page
+        Auth.isAuthenticated().then((authenticated) => {
+            if (authenticated) {
+                window.location.href = getSafeRedirect();
+            }
+        });
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -196,10 +211,10 @@
 
             if (await Auth.login(password, remember)) {
                 // Login successful, redirect
-                const redirect = new URLSearchParams(window.location.search).get('redirect') || 'index.html';
-                window.location.href = redirect;
+                window.location.href = getSafeRedirect();
             } else {
                 // Login failed
+                errorMessage.textContent = '密码错误或尝试过于频繁，请稍后重试。';
                 errorMessage.style.display = 'block';
                 passwordInput.value = '';
                 passwordInput.focus();

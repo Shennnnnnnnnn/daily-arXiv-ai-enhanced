@@ -1,5 +1,23 @@
 # 🚀 daily-arXiv-ai-enhanced
 
+## Server deployment
+
+The repository can also run as a private, stateful server application. The server protects every page with an HttpOnly session cookie and stores settings and favorites in SQLite.
+
+```bash
+cp .env.example .env
+# Set a strong ADMIN_PASSWORD in .env before starting.
+docker compose up -d --build
+```
+
+The container listens on `127.0.0.1:8765` by default. Put it behind an HTTPS reverse proxy and keep the application port private. After signing in, use **Settings** to configure the OpenAI endpoint/model, arXiv categories, daily run time or cron expression, keywords/authors, Zotero credentials, and SMTP delivery. Secrets are write-only in the browser and remain unchanged when their fields are left empty. The AI and Zotero sections include connection tests that can validate unsaved form values without exposing credentials.
+
+Zotero library recommendations can be enabled independently in Settings. The scheduled job reads journal articles, conference papers, and preprints with abstracts from the Zotero library, restores collection paths, applies optional include/exclude glob patterns, and ranks that day's papers with an OpenAI-compatible embedding model. The highest-ranked papers are delivered as an HTML email. SMTP ports 25/587 use STARTTLS when available; port 465 uses implicit TLS.
+
+The maintained instance is deployed at `https://arxiv.ai-stock.cc.cd` on the `ssh sg` host. Its HTTPS entrypoint is Caddy, which proxies to the loopback-only application port. Set `COOKIE_SECURE=true` for this HTTPS deployment; keep the default `false` only for direct local HTTP access.
+
+Runtime state is persisted in the `arxiv-data` Docker volume. To back it up, copy `/app/data/server.sqlite3` from that volume. The existing GitHub Pages workflow remains available, but server-only capabilities require this application server.
+
 > [!CAUTION]
 > 若您所在法域对学术数据有审查要求，谨慎运行本代码；任何二次分发版本必须履行合规审查（包括但不限于原始论文合规性、AI合规性）义务，否则一切法律后果由下游自行承担。
 

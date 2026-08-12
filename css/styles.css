@@ -103,6 +103,77 @@ button {
   background-color: rgba(102, 126, 234, 0.1);
 }
 
+.icon-button.active,
+.paper-favorite-button.active {
+  color: #b42318;
+  background: #fff1f0;
+}
+
+.paper-favorite-button {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 3;
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+}
+
+.paper-favorite-button.inactive {
+  color: #667085;
+  background: #fff;
+  border-color: #98a2b3;
+}
+
+.paper-favorite-button.active svg path,
+.favorite-detail-button.active svg path {
+  fill: currentColor;
+}
+
+.favorite-detail-button {
+  width: auto;
+  min-width: 92px;
+  height: 40px;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid #98a2b3;
+  border-radius: 6px;
+  color: #475467;
+  background: #fff;
+}
+
+.favorite-detail-button.active {
+  color: #b42318;
+  background: #fff1f0;
+  border-color: #fda29b;
+}
+
+.favorite-action-label {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.zotero-mark {
+  color: #cc2936;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+#zoteroSyncButton.success {
+  background: #ecfdf3;
+  color: #067647;
+}
+
 /* 视图控制按钮样式 */
 .view-controls {
   display: flex;
@@ -1225,12 +1296,14 @@ input:checked + .toggle-slider:before {
 @media (max-width: 768px) {
   .header-content {
     padding: 12px 16px;
+    flex-direction: column;
+    gap: 8px;
   }
   
   .header-center {
     position: static;
     transform: none;
-    margin-bottom: 8px;
+    margin-bottom: 0;
   }
   
   .header-left {
@@ -1238,7 +1311,11 @@ input:checked + .toggle-slider:before {
   }
   
   .header-controls {
-    margin-left: auto;
+    width: 100%;
+    margin-left: 0;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
   }
   
   .category-scroll {

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="daily arxiv ai-enhanced settings">
-    <title>Settings - Daily arXiv AI Enhanced</title>
+    <title>设置 - Daily arXiv AI Enhanced</title>
     <link rel="icon" type="image/png" href="assets/logo2-removebg-preview.png">
     <link rel="shortcut icon" type="image/png" href="assets/logo2-removebg-preview.png">
     <link rel="stylesheet" href="css/styles.css">
@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
 
     <!-- Authentication Scripts -->
-    <script src="js/auth-config.js"></script>
+    <script src="js/api.js"></script>
     <script src="js/auth.js"></script>
     <script>
         // Check authentication on page load
@@ -31,29 +31,6 @@
     <div class="app-container">
         <header>
             <div class="header-content">
-                <div class="header-left">
-                    <a href="https://github.com/dw-dengwei/daily-arXiv-ai-enhanced" target="_blank" class="github-button">
-                        <svg height="20" width="20" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                            <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
-                        </svg>
-                        <span class="github-text">GitHub</span>
-                        <div class="github-stats">
-                            <div class="star-badge">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                </svg>
-                                <span class="star-count" id="starCount">-</span>
-                            </div>
-                            <div class="fork-badge">
-                                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
-                                    <path d="M5 5.372v.878c0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75v-.878a2.25 2.25 0 1 1 1.5 0v.878a2.25 2.25 0 0 1-2.25 2.25h-1.5v2.128a2.251 2.251 0 1 1-1.5 0V8.5h-1.5A2.25 2.25 0 0 1 3.5 6.25v-.878a2.25 2.25 0 1 1 1.5 0ZM5 3.25a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Zm6.75.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm-3 8.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z"/>
-                                </svg>
-                                <span class="fork-count" id="forkCount">-</span>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                
                 <div class="header-center">
                     <a href="index.html" class="site-logo">
                         <img src="assets/logo2-removebg-preview.png" alt="Daily arXiv AI Enhanced Logo" class="logo-image">
@@ -67,7 +44,7 @@
                             <path d="M20 11H7.83L13.42 5.41L12 4L4 12L12 20L13.41 18.59L7.83 13H20V11Z" fill="currentColor"/>
                         </svg>
                     </a>
-                    <button id="logoutButton" onclick="Auth.logout()" class="icon-button" title="Logout" style="border: none; background: transparent; cursor: pointer; color: #e74c3c; display: none;">
+                    <button id="logoutButton" onclick="Auth.logout()" class="icon-button" title="退出登录" style="border: none; background: transparent; cursor: pointer; color: #e74c3c; display: none;">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M17 7L15.59 8.41L18.17 11H8V13H18.17L15.59 15.59L17 17L22 12L17 7ZM4 5H12V3H4C2.9 3 2 3.9 2 5V19C2 20.1 2.9 21 4 21H12V19H4V5Z" fill="currentColor"/>
                         </svg>
@@ -79,8 +56,8 @@
         <main class="settings-page">
             <div class="settings-container">
                 <div class="settings-header">
-                    <h1>Settings</h1>
-                    <p>Customize your Daily arXiv AI Enhanced experience</p>
+                    <h1>设置</h1>
+                    <p>配置论文采集、AI 分析、Zotero 与邮件推送</p>
                 </div>
 
                 <div class="settings-content">
@@ -90,27 +67,102 @@
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M17.63 5.84C17.27 5.33 16.67 5 16 5L5 5.01C3.9 5.01 3 5.9 3 7V17C3 18.1 3.9 18.99 5 18.99L16 19C16.67 19 17.27 18.67 17.63 18.16L22 12L17.63 5.84ZM16 17H5V7H16L19.55 12L16 17Z" fill="currentColor"/>
                                 </svg>
-                                Interested Keywords
+                                关注关键词
                             </div>
-                            <button id="copyKeywords" class="copy-button" title="Copy keywords to clipboard">
+                            <button id="copyKeywords" class="copy-button" title="复制关键词">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" fill="currentColor"/>
                                 </svg>
-                                Copy
+                                复制
                             </button>
                         </div>
                         <div class="settings-card">
                             <div class="settings-item">
                                 <div class="tag-selector">
                                     <div class="selected-tags" id="selectedKeywords">
-                                        <div class="empty-tag-message" id="emptyTagMessage">No keywords added yet. Add some keywords below.</div>
+                                        <div class="empty-tag-message" id="emptyTagMessage">尚未添加关键词</div>
                                     </div>
                                     <div class="tag-input-container">
-                                        <input type="text" id="keywordInput" class="settings-input" placeholder="Enter a keyword and press Enter...">
-                                        <button id="addKeyword" class="add-tag-button">Add</button>
+                                        <input type="text" id="keywordInput" class="settings-input" placeholder="输入关键词并按回车">
+                                        <button id="addKeyword" class="add-tag-button">添加</button>
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h2>采集与 AI</h2>
+                        <div class="settings-card settings-grid">
+                            <label>OpenAI API Key<input id="aiApiKey" type="password" class="settings-input" autocomplete="new-password" placeholder="留空保留现有密钥"></label>
+                            <label>OpenAI API Base<input id="aiApiBase" type="url" class="settings-input" placeholder="https://api.openai.com/v1"></label>
+                            <label>AI Model<input id="aiModel" type="text" class="settings-input" placeholder="gpt-4o-mini"></label>
+                            <label>论文 AI 助手
+                                <select id="paperAiAssistant" class="settings-input">
+                                    <option value="kimi">Kimi</option>
+                                    <option value="chatgpt">ChatGPT</option>
+                                    <option value="claude">Claude</option>
+                                    <option value="custom">自定义</option>
+                                </select>
+                            </label>
+                            <label>自定义助手 URL<input id="paperAiCustomUrl" type="url" class="settings-input" placeholder="https://example.com/?q={prompt}"></label>
+                            <label>运行时间 / Cron<input id="schedule" type="text" class="settings-input" placeholder="09:00 或 */15 * * * *"></label>
+                            <label>arXiv 分类<input id="categories" type="text" class="settings-input" placeholder="cs.CV, cs.CL"></label>
+                            <div class="settings-inline-actions">
+                                <button id="testAi" type="button" class="button">测试 AI 配置</button>
+                                <span id="aiTestStatus" class="test-status" aria-live="polite"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h2>Zotero</h2>
+                        <div class="settings-card settings-grid">
+                            <label>Zotero User ID<input id="zoteroId" type="text" class="settings-input"></label>
+                            <label>Zotero API Key<input id="zoteroKey" type="password" class="settings-input" autocomplete="new-password" placeholder="留空保留现有密钥"></label>
+                            <label>同步目标目录<input id="zoteroTargetCollection" type="text" class="settings-input" placeholder="我的文库/arxiv"></label>
+                            <label class="toggle-row"><span>按 Zotero 文库兴趣推荐</span><input id="zoteroRecommendationEnabled" type="checkbox"></label>
+                            <label>Embedding Model<input id="zoteroEmbeddingModel" type="text" class="settings-input" placeholder="text-embedding-3-small"></label>
+                            <label>包含收藏夹路径<input id="zoteroIncludePaths" type="text" class="settings-input" placeholder="2026/survey/**, reading/**"></label>
+                            <label>排除收藏夹路径<input id="zoteroIgnorePaths" type="text" class="settings-input" placeholder="archive/**, ignored/**"></label>
+                            <label>每日推荐上限<input id="zoteroMaxPapers" type="number" min="1" max="100" class="settings-input" value="20"></label>
+                            <div class="settings-inline-actions">
+                                <button id="testZotero" type="button" class="button">测试 Zotero 配置</button>
+                                <span id="zoteroTestStatus" class="test-status" aria-live="polite"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h2>邮件推送</h2>
+                        <div class="settings-card settings-grid">
+                            <label class="toggle-row"><span>启用每日邮件</span><input id="emailEnabled" type="checkbox"></label>
+                            <label>SMTP Host<input id="smtpHost" type="text" class="settings-input"></label>
+                            <label>SMTP Port<input id="smtpPort" type="number" min="1" max="65535" class="settings-input" value="587"></label>
+                            <label>SMTP User<input id="smtpUser" type="text" class="settings-input"></label>
+                            <label>SMTP Password<input id="smtpPassword" type="password" class="settings-input" autocomplete="new-password" placeholder="留空保留现有密钥"></label>
+                            <label>发件人<input id="emailFrom" type="email" class="settings-input"></label>
+                            <label>收件人<input id="emailTo" type="text" class="settings-input" placeholder="多个邮箱用逗号分隔"></label>
+                            <div class="settings-inline-actions">
+                                <button id="testEmail" type="button" class="button">发送测试邮件</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h2>任务</h2>
+                        <div class="settings-card job-panel">
+                            <div><strong>最近状态</strong><span id="jobStatus">正在读取...</span></div>
+                            <button id="runJob" type="button" class="button">立即运行</button>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h2>管理员密码</h2>
+                        <div class="settings-card settings-grid">
+                            <label>当前密码<input id="currentPassword" type="password" class="settings-input" autocomplete="current-password"></label>
+                            <label>新密码<input id="newPassword" type="password" minlength="12" class="settings-input" autocomplete="new-password" placeholder="至少 12 个字符"></label>
+                            <div class="settings-inline-actions"><button id="changePassword" type="button" class="button">更新密码</button></div>
                         </div>
                     </div>
 
@@ -120,24 +172,24 @@
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="currentColor"/>
                                 </svg>
-                                Interested Authors
+                                关注作者
                             </div>
-                            <button id="copyAuthors" class="copy-button" title="Copy authors to clipboard">
+                            <button id="copyAuthors" class="copy-button" title="复制作者">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" fill="currentColor"/>
                                 </svg>
-                                Copy
+                                复制
                             </button>
                         </div>
                         <div class="settings-card">
                             <div class="settings-item">
                                 <div class="tag-selector">
                                     <div class="selected-tags" id="selectedAuthors">
-                                        <div class="empty-tag-message" id="emptyAuthorMessage">No authors added yet. Add some authors below.</div>
+                                        <div class="empty-tag-message" id="emptyAuthorMessage">尚未添加作者</div>
                                     </div>
                                     <div class="tag-input-container">
-                                        <input type="text" id="authorInput" class="settings-input" placeholder="Enter an author name and press Enter...">
-                                        <button id="addAuthor" class="add-tag-button">Add</button>
+                                        <input type="text" id="authorInput" class="settings-input" placeholder="输入作者并按回车">
+                                        <button id="addAuthor" class="add-tag-button">添加</button>
                                     </div>
                                 </div>
                             </div>
@@ -146,8 +198,8 @@
                 </div>
 
                 <div class="settings-actions">
-                    <button id="resetSettings" class="button">Reset to Default</button>
-                    <button id="saveSettings" class="button primary">Save Settings</button>
+                    <button id="resetSettings" class="button">重置偏好</button>
+                    <button id="saveSettings" class="button primary">保存设置</button>
                 </div>
             </div>
         </main>
@@ -161,4 +213,4 @@
 
     <script src="js/settings.js"></script>
 </body>
-</html> 
+</html>
